@@ -9,7 +9,7 @@
 
 namespace {
 
-constexpr std::size_t data_size = 4096;
+constexpr std::size_t data_size = 1 << 20;
 
 auto make_data() -> std::array<unsigned char, data_size>
 {
@@ -26,6 +26,16 @@ auto make_data() -> std::array<unsigned char, data_size>
 
 auto const data = make_data();
 
+void set_byte_counters(benchmark::State& state)
+{
+    auto const bytes_per_iteration = static_cast<std::int64_t>(data.size());
+
+    state.SetBytesProcessed(state.iterations() * bytes_per_iteration);
+    state.counters["time_per_byte"] = benchmark::Counter(
+        data.size(),
+        benchmark::Counter::kIsIterationInvariantRate | benchmark::Counter::kInvert);
+}
+
 template<typename Predicate>
 void classify_all(benchmark::State& state, Predicate predicate)
 {
@@ -37,7 +47,7 @@ void classify_all(benchmark::State& state, Predicate predicate)
         benchmark::DoNotOptimize(count);
     }
 
-    state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(data.size()));
+    set_byte_counters(state);
 }
 
 // clang-format off
@@ -134,7 +144,7 @@ void convert_all(benchmark::State& state, Converter converter)
         }
         benchmark::DoNotOptimize(sum);
     }
-    state.SetItemsProcessed(state.iterations() * static_cast<std::int64_t>(data.size()));
+    set_byte_counters(state);
 }
 
 void BM_fastlex_tolower(benchmark::State& state)
