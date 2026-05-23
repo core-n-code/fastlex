@@ -4,4 +4,3 @@ build-*/
 .cache/
 /compile_commands.json
 *.pyc
-/cmake/

@@ -295,8 +295,32 @@ Run them after building:
 ./build/benchmark/fastlex_ascii_benchmark
 ```
 
-The benchmark input is deterministic pseudo-random byte data, so results are
-repeatable across runs on the same machine.
+These numbers were measured with:
+
+```text
+CPU:       AMD Ryzen 9 7950X
+OS:        NixOS, Linux 7.0.6
+Compiler:  clang 22.1.5
+Command:   ./build/benchmark/fastlex_ascii_benchmark --benchmark_min_time=0.05s --benchmark_repetitions=5 --benchmark_report_aggregates_only=true
+```
+
+```text
+Predicate   fastlex    branch     std::cctype
+isalnum     5.01 GB/s  1.94 GB/s  547 MB/s
+isalpha     4.98 GB/s  2.99 GB/s  547 MB/s
+isblank     3.97 GB/s  3.97 GB/s  498 MB/s
+iscntrl     5.02 GB/s  3.31 GB/s  547 MB/s
+isdigit     3.90 GB/s  3.26 GB/s  3.26 GB/s
+isgraph     3.90 GB/s  3.26 GB/s  547 MB/s
+islower     3.92 GB/s  3.27 GB/s  607 MB/s
+isprint     3.82 GB/s  3.25 GB/s  546 MB/s
+ispunct     4.99 GB/s  1.83 GB/s  545 MB/s
+isspace     4.99 GB/s  3.03 GB/s  545 MB/s
+isupper     3.90 GB/s  3.26 GB/s  547 MB/s
+isxdigit    5.00 GB/s  1.94 GB/s  547 MB/s
+tolower     7.01 GB/s  3.27 GB/s  497 MB/s
+toupper     7.01 GB/s  3.26 GB/s  495 MB/s
+```
 
 ## Nix
 
