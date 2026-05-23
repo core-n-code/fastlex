@@ -7,7 +7,12 @@
   };
 
   outputs =
-    { self, nixpkgs, flake-utils, ... }:
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      ...
+    }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
@@ -63,18 +68,6 @@
             llvm.libcxx
             pkgs.gtest
             pkgs.gbenchmark
-          ];
-
-          packages = [
-            (pkgs.python3.withPackages (
-              ps: with ps; [
-                pip
-                setuptools
-                numpy
-                matplotlib
-              ]
-            ))
-            pkgs.ripgrep
           ];
 
           shellHook = ''
