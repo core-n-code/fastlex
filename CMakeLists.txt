@@ -20,7 +20,7 @@ target_include_directories(
   fastlex
   INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_compile_features(fastlex INTERFACE cxx_std_20)
+target_compile_features(fastlex INTERFACE cxx_std_23)
 
 if(FASTLEX_BUILD_EXAMPLES)
   add_subdirectory(example)
