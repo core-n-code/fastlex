@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 project(
   fastlex
-  VERSION 0.1.0
+  VERSION 1.0.0
   DESCRIPTION "Branchless constexpr ASCII character classification"
   LANGUAGES CXX)
 
