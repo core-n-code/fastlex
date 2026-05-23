@@ -1,4 +1,8 @@
 # fastlex
+[![CI](https://github.com/core-n-code/fastlex/actions/workflows/ci.yml/badge.svg)](https://github.com/core-n-code/fastlex/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+
 
 `fastlex` is a tiny C++23 header-only library for fast ASCII character
 classification and ASCII case conversion.
