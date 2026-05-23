@@ -83,56 +83,116 @@ constexpr auto branch_toupper(unsigned char c) -> unsigned char { return branch_
         classify_all(state, [](unsigned char c) { return (std_expr); }); \
     }
 
+#define FASTLEX_DEFINE_BACKEND_BENCHMARKS(name, bitmap_expr, lookup_expr) \
+    void BM_fastlex_bitmap_##name(benchmark::State& state) \
+    { \
+        classify_all(state, [](unsigned char c) { return (bitmap_expr); }); \
+    } \
+\
+    void BM_fastlex_lookup_##name(benchmark::State& state) \
+    { \
+        classify_all(state, [](unsigned char c) { return (lookup_expr); }); \
+    }
+
 FASTLEX_DEFINE_CLASS_BENCHMARKS(isalnum,
                                 fastlex::ascii::isalnum(c),
                                 branch_isalnum(c),
                                 std::isalnum(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    isalnum,
+    fastlex::ascii::isalnum<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::isalnum<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(isalpha,
                                 fastlex::ascii::isalpha(c),
                                 branch_isalpha(c),
                                 std::isalpha(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    isalpha,
+    fastlex::ascii::isalpha<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::isalpha<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(isblank,
                                 fastlex::ascii::isblank(c),
                                 branch_isblank(c),
                                 std::isblank(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    isblank,
+    fastlex::ascii::isblank<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::isblank<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(iscntrl,
                                 fastlex::ascii::iscntrl(c),
                                 branch_iscntrl(c),
                                 std::iscntrl(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    iscntrl,
+    fastlex::ascii::iscntrl<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::iscntrl<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(isdigit,
                                 fastlex::ascii::isdigit(c),
                                 branch_isdigit(c),
                                 std::isdigit(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    isdigit,
+    fastlex::ascii::isdigit<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::isdigit<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(isgraph,
                                 fastlex::ascii::isgraph(c),
                                 branch_isgraph(c),
                                 std::isgraph(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    isgraph,
+    fastlex::ascii::isgraph<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::isgraph<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(islower,
                                 fastlex::ascii::islower(c),
                                 branch_islower(c),
                                 std::islower(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    islower,
+    fastlex::ascii::islower<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::islower<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(isprint,
                                 fastlex::ascii::isprint(c),
                                 branch_isprint(c),
                                 std::isprint(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    isprint,
+    fastlex::ascii::isprint<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::isprint<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(ispunct,
                                 fastlex::ascii::ispunct(c),
                                 branch_ispunct(c),
                                 std::ispunct(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    ispunct,
+    fastlex::ascii::ispunct<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::ispunct<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(isspace,
                                 fastlex::ascii::isspace(c),
                                 branch_isspace(c),
                                 std::isspace(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    isspace,
+    fastlex::ascii::isspace<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::isspace<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(isupper,
                                 fastlex::ascii::isupper(c),
                                 branch_isupper(c),
                                 std::isupper(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    isupper,
+    fastlex::ascii::isupper<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::isupper<fastlex::ascii::matcher_backend::LOOKUP>(c))
 FASTLEX_DEFINE_CLASS_BENCHMARKS(isxdigit,
                                 fastlex::ascii::isxdigit(c),
                                 branch_isxdigit(c),
                                 std::isxdigit(c) != 0)
+FASTLEX_DEFINE_BACKEND_BENCHMARKS(
+    isxdigit,
+    fastlex::ascii::isxdigit<fastlex::ascii::matcher_backend::BITMAP>(c),
+    fastlex::ascii::isxdigit<fastlex::ascii::matcher_backend::LOOKUP>(c))
 
 #undef FASTLEX_DEFINE_CLASS_BENCHMARKS
+#undef FASTLEX_DEFINE_BACKEND_BENCHMARKS
 
 template<typename Converter>
 void convert_all(benchmark::State& state, Converter converter)
@@ -180,39 +240,63 @@ void BM_std_toupper(benchmark::State& state)
 } // namespace
 
 BENCHMARK(BM_fastlex_isalnum);
+BENCHMARK(BM_fastlex_bitmap_isalnum);
+BENCHMARK(BM_fastlex_lookup_isalnum);
 BENCHMARK(BM_branch_isalnum);
 BENCHMARK(BM_std_isalnum);
 BENCHMARK(BM_fastlex_isalpha);
+BENCHMARK(BM_fastlex_bitmap_isalpha);
+BENCHMARK(BM_fastlex_lookup_isalpha);
 BENCHMARK(BM_branch_isalpha);
 BENCHMARK(BM_std_isalpha);
 BENCHMARK(BM_fastlex_isblank);
+BENCHMARK(BM_fastlex_bitmap_isblank);
+BENCHMARK(BM_fastlex_lookup_isblank);
 BENCHMARK(BM_branch_isblank);
 BENCHMARK(BM_std_isblank);
 BENCHMARK(BM_fastlex_iscntrl);
+BENCHMARK(BM_fastlex_bitmap_iscntrl);
+BENCHMARK(BM_fastlex_lookup_iscntrl);
 BENCHMARK(BM_branch_iscntrl);
 BENCHMARK(BM_std_iscntrl);
 BENCHMARK(BM_fastlex_isdigit);
+BENCHMARK(BM_fastlex_bitmap_isdigit);
+BENCHMARK(BM_fastlex_lookup_isdigit);
 BENCHMARK(BM_branch_isdigit);
 BENCHMARK(BM_std_isdigit);
 BENCHMARK(BM_fastlex_isgraph);
+BENCHMARK(BM_fastlex_bitmap_isgraph);
+BENCHMARK(BM_fastlex_lookup_isgraph);
 BENCHMARK(BM_branch_isgraph);
 BENCHMARK(BM_std_isgraph);
 BENCHMARK(BM_fastlex_islower);
+BENCHMARK(BM_fastlex_bitmap_islower);
+BENCHMARK(BM_fastlex_lookup_islower);
 BENCHMARK(BM_branch_islower);
 BENCHMARK(BM_std_islower);
 BENCHMARK(BM_fastlex_isprint);
+BENCHMARK(BM_fastlex_bitmap_isprint);
+BENCHMARK(BM_fastlex_lookup_isprint);
 BENCHMARK(BM_branch_isprint);
 BENCHMARK(BM_std_isprint);
 BENCHMARK(BM_fastlex_ispunct);
+BENCHMARK(BM_fastlex_bitmap_ispunct);
+BENCHMARK(BM_fastlex_lookup_ispunct);
 BENCHMARK(BM_branch_ispunct);
 BENCHMARK(BM_std_ispunct);
 BENCHMARK(BM_fastlex_isspace);
+BENCHMARK(BM_fastlex_bitmap_isspace);
+BENCHMARK(BM_fastlex_lookup_isspace);
 BENCHMARK(BM_branch_isspace);
 BENCHMARK(BM_std_isspace);
 BENCHMARK(BM_fastlex_isupper);
+BENCHMARK(BM_fastlex_bitmap_isupper);
+BENCHMARK(BM_fastlex_lookup_isupper);
 BENCHMARK(BM_branch_isupper);
 BENCHMARK(BM_std_isupper);
 BENCHMARK(BM_fastlex_isxdigit);
+BENCHMARK(BM_fastlex_bitmap_isxdigit);
+BENCHMARK(BM_fastlex_lookup_isxdigit);
 BENCHMARK(BM_branch_isxdigit);
 BENCHMARK(BM_std_isxdigit);
 BENCHMARK(BM_fastlex_tolower);
