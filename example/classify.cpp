@@ -3,11 +3,11 @@
 #include <iostream>
 #include <string_view>
 
-int main()
+auto main() -> int
 {
-    constexpr std::string_view token = "Cafe_BEEF42";
+    constexpr std::string_view token = "Cafe_BEEF69";
 
-    for (unsigned char c : token) {
+    for(unsigned char c : token) {
         std::cout << c << " alpha=" << fastlex::ascii::isalpha(c)
                   << " digit=" << fastlex::ascii::isdigit(c)
                   << " hex=" << fastlex::ascii::isxdigit(c)
