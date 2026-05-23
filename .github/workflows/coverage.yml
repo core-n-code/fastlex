@@ -1,0 +1,72 @@
+name: Coverage
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    name: LLVM coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Configure with instrumentation
+        run: >
+          nix develop --command cmake -S . -B build/coverage -G Ninja
+          -DCMAKE_BUILD_TYPE=Debug
+          -DFASTLEX_BUILD_TESTS=ON
+          -DFASTLEX_BUILD_BENCHMARKS=OFF
+          -DFASTLEX_BUILD_EXAMPLES=OFF
+          -DCMAKE_CXX_COMPILER=clang++
+          -DCMAKE_CXX_FLAGS="-O0 -g -fprofile-instr-generate -fcoverage-mapping"
+          -DCMAKE_EXE_LINKER_FLAGS="-fprofile-instr-generate -fcoverage-mapping"
+
+      - name: Build
+        run: nix develop --command cmake --build build/coverage
+
+      - name: Test
+        run: |
+          mkdir -p build/coverage/profiles
+          nix develop --command env \
+            LLVM_PROFILE_FILE="$PWD/build/coverage/profiles/fastlex-%p.profraw" \
+            ctest --test-dir build/coverage --output-on-failure
+
+      - name: Generate coverage reports
+        run: |
+          nix develop --command llvm-profdata merge -sparse \
+            build/coverage/profiles/*.profraw \
+            -o build/coverage/coverage.profdata
+
+          nix develop --command llvm-cov report \
+            build/coverage/test/fastlex_ascii_test \
+            -instr-profile=build/coverage/coverage.profdata \
+            include/fastlex/ascii.hpp \
+            > build/coverage/summary.txt
+
+          nix develop --command llvm-cov show \
+            build/coverage/test/fastlex_ascii_test \
+            -instr-profile=build/coverage/coverage.profdata \
+            -format=html \
+            -output-dir=build/coverage/html \
+            include/fastlex/ascii.hpp
+
+          {
+            echo "## Coverage"
+            echo
+            echo '```text'
+            cat build/coverage/summary.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload HTML coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastlex-coverage-html
+          path: build/coverage/html

@@ -52,6 +52,7 @@
             llvm.clang-tools
             llvm.clang
             llvm.llvm
+            pkgs.gcc14
             pkgs.cmake
             pkgs.ninja
             pkgs.gdb

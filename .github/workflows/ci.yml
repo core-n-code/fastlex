@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  nix:
+    name: Nix flake check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Check flake
+        run: nix flake check --print-build-logs
+
+  cmake:
+    name: CMake (${{ matrix.compiler }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: clang
+            cxx: clang++
+          - compiler: gcc
+            cxx: g++
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Configure
+        run: >
+          nix develop --command cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DFASTLEX_BUILD_TESTS=ON
+          -DFASTLEX_BUILD_BENCHMARKS=ON
+          -DFASTLEX_BUILD_EXAMPLES=ON
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+
+      - name: Build
+        run: nix develop --command cmake --build build
+
+      - name: Test
+        run: nix develop --command ctest --test-dir build --output-on-failure
+
