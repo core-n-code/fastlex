@@ -32,7 +32,7 @@ using char_map = std::array<unsigned char, 256>;
 
 [[nodiscard]] FASTLEX_ALWAYS_INLINE constexpr auto bitmap_contains(char_bitmap const& table,
                                                                    unsigned char x) noexcept -> bool
-{ return (table[x >> 6] & (std::uint64_t{1} << (x & 63u))) != 0u; }
+{ return (table[x >> 6] >> (x & 63u)) & 1u; }
 
 [[nodiscard]] consteval auto make_lookup(char_bitmap bitmap) noexcept -> char_map
 {
@@ -69,7 +69,7 @@ struct alignas(64) custom_matcher<matcher_backend::LOOKUP>
 
     [[nodiscard]] FASTLEX_ALWAYS_INLINE constexpr auto operator()(unsigned char x) const noexcept
         -> bool
-    { return lookup_[x] != 0u; }
+    { return lookup_[x]; }
 
 private:
     char_map lookup_;
