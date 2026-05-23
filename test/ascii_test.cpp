@@ -4,33 +4,21 @@
 
 namespace {
 
+// clang-format off
 constexpr auto between(int c, int lo, int hi) -> bool { return c >= lo && c <= hi; }
-
 constexpr auto expect_digit(int c) -> bool { return between(c, '0', '9'); }
-
 constexpr auto expect_upper(int c) -> bool { return between(c, 'A', 'Z'); }
-
 constexpr auto expect_lower(int c) -> bool { return between(c, 'a', 'z'); }
-
 constexpr auto expect_alpha(int c) -> bool { return expect_upper(c) || expect_lower(c); }
-
 constexpr auto expect_alnum(int c) -> bool { return expect_alpha(c) || expect_digit(c); }
-
 constexpr auto expect_blank(int c) -> bool { return c == '\t' || c == ' '; }
-
 constexpr auto expect_cntrl(int c) -> bool { return between(c, 0x00, 0x1f) || c == 0x7f; }
-
 constexpr auto expect_graph(int c) -> bool { return between(c, 0x21, 0x7e); }
-
 constexpr auto expect_print(int c) -> bool { return between(c, 0x20, 0x7e); }
-
-constexpr auto expect_space(int c) -> bool
-{ return c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' || c == ' '; }
-
-constexpr auto expect_xdigit(int c) -> bool
-{ return expect_digit(c) || between(c, 'A', 'F') || between(c, 'a', 'f'); }
-
+constexpr auto expect_space(int c) -> bool { return c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r' || c == ' '; }
+constexpr auto expect_xdigit(int c) -> bool { return expect_digit(c) || between(c, 'A', 'F') || between(c, 'a', 'f'); }
 constexpr auto expect_punct(int c) -> bool { return expect_graph(c) && !expect_alnum(c); }
+// clang-format on
 
 constexpr auto expect_lowered(int c) -> unsigned char
 {
@@ -55,6 +43,7 @@ constexpr auto all_bytes(Predicate predicate) -> bool
     return true;
 }
 
+// clang-format off
 static_assert(fastlex::ascii::bitmap_contains(fastlex::ascii::digit_chars, '7'));
 static_assert(!fastlex::ascii::bitmap_contains(fastlex::ascii::digit_chars, 'x'));
 static_assert(fastlex::ascii::make_bitmap("az")[0] == 0);
@@ -66,48 +55,21 @@ static_assert(fastlex::ascii::tolower('A') == 'a');
 static_assert(fastlex::ascii::toupper('z') == 'Z');
 static_assert(fastlex::ascii::tolower('[') == '[');
 static_assert(fastlex::ascii::toupper('`') == '`');
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::isalnum(c) == expect_alnum(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::isalpha(c) == expect_alpha(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::isblank(c) == expect_blank(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::iscntrl(c) == expect_cntrl(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::isdigit(c) == expect_digit(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::isgraph(c) == expect_graph(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::islower(c) == expect_lower(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::isprint(c) == expect_print(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::ispunct(c) == expect_punct(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::isspace(c) == expect_space(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::isupper(c) == expect_upper(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::isxdigit(c) == expect_xdigit(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::tolower(c) == expect_lowered(c);
-}));
-static_assert(all_bytes([](unsigned char c) {
-    return fastlex::ascii::toupper(c) == expect_uppered(c);
-}));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::isalnum(c) == expect_alnum(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::isalpha(c) == expect_alpha(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::isblank(c) == expect_blank(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::iscntrl(c) == expect_cntrl(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::isdigit(c) == expect_digit(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::isgraph(c) == expect_graph(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::islower(c) == expect_lower(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::isprint(c) == expect_print(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::ispunct(c) == expect_punct(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::isspace(c) == expect_space(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::isupper(c) == expect_upper(c); }));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::isxdigit(c) == expect_xdigit(c);}));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::tolower(c) == expect_lowered(c);}));
+static_assert(all_bytes([](unsigned char c) { return fastlex::ascii::toupper(c) == expect_uppered(c);}));
+// clang-format on
 
 } // namespace
 
