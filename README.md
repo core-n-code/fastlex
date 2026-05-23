@@ -302,11 +302,23 @@ Run them after building:
 These numbers were measured with:
 
 ```text
-CPU:       AMD Ryzen 9 7950X
-OS:        NixOS, Linux 7.0.6
-Compiler:  clang 22.1.5
+CPU:       AMD Ryzen 9 7950X, 16 cores / 32 threads
+Caches:    L1d 32 KiB x16, L2 1 MiB x16, L3 32 MiB x2
+OS:        NixOS, Linux 7.0.6, x86_64
+Compiler:  clang++ 22.1.5
 Command:   ./build/benchmark/fastlex_ascii_benchmark --benchmark_min_time=0.05s --benchmark_repetitions=5 --benchmark_report_aggregates_only=true
 ```
+
+The table reports input throughput, not total memory traffic. Each benchmark
+processes a fixed 4096-byte input buffer and calls:
+
+```cpp
+state.SetBytesProcessed(state.iterations() * data.size());
+```
+
+So Google Benchmark reports real byte throughput with `bytes_per_second`.
+The benchmark also prints `time_per_byte`, which is the inverse throughput for a
+single input byte.
 
 ```text
 Predicate   fastlex    branch     std::cctype
@@ -324,6 +336,26 @@ isupper     3.90 GB/s  3.26 GB/s  547 MB/s
 isxdigit    5.00 GB/s  1.94 GB/s  547 MB/s
 tolower     7.01 GB/s  3.27 GB/s  497 MB/s
 toupper     7.01 GB/s  3.26 GB/s  495 MB/s
+```
+
+The same run also reports per-byte latency:
+
+```text
+Predicate   fastlex  branch  std::cctype
+isalnum     198 ps   515 ps  1.82 ns
+isalpha     198 ps   332 ps  1.81 ns
+isblank     250 ps   250 ps  2.01 ns
+iscntrl     199 ps   301 ps  1.82 ns
+isdigit     255 ps   305 ps  304 ps
+isgraph     254 ps   305 ps  1.82 ns
+islower     254 ps   305 ps  1.82 ns
+isprint     255 ps   308 ps  1.82 ns
+ispunct     200 ps   597 ps  2.00 ns
+isspace     202 ps   327 ps  1.64 ns
+isupper     254 ps   306 ps  1.81 ns
+isxdigit    198 ps   515 ps  1.82 ns
+tolower     142 ps   305 ps  2.00 ns
+toupper     142 ps   304 ps  2.01 ns
 ```
 
 ## Nix
