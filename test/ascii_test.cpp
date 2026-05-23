@@ -106,6 +106,41 @@ TEST(FastlexAscii, MatchesAsciiCtypeClassesForEveryByte)
     }
 }
 
+TEST(FastlexAscii, MatchesAsciiCtypeClassesForEveryByteWithBothBackends)
+{
+    using enum fastlex::ascii::matcher_backend;
+
+    for(int c = 0; c <= 255; ++c) {
+        auto const byte = static_cast<unsigned char>(c);
+        SCOPED_TRACE(c);
+
+        EXPECT_EQ(fastlex::ascii::isalnum<BITMAP>(byte), expect_alnum(c));
+        EXPECT_EQ(fastlex::ascii::isalnum<LOOKUP>(byte), expect_alnum(c));
+        EXPECT_EQ(fastlex::ascii::isalpha<BITMAP>(byte), expect_alpha(c));
+        EXPECT_EQ(fastlex::ascii::isalpha<LOOKUP>(byte), expect_alpha(c));
+        EXPECT_EQ(fastlex::ascii::isblank<BITMAP>(byte), expect_blank(c));
+        EXPECT_EQ(fastlex::ascii::isblank<LOOKUP>(byte), expect_blank(c));
+        EXPECT_EQ(fastlex::ascii::iscntrl<BITMAP>(byte), expect_cntrl(c));
+        EXPECT_EQ(fastlex::ascii::iscntrl<LOOKUP>(byte), expect_cntrl(c));
+        EXPECT_EQ(fastlex::ascii::isdigit<BITMAP>(byte), expect_digit(c));
+        EXPECT_EQ(fastlex::ascii::isdigit<LOOKUP>(byte), expect_digit(c));
+        EXPECT_EQ(fastlex::ascii::isgraph<BITMAP>(byte), expect_graph(c));
+        EXPECT_EQ(fastlex::ascii::isgraph<LOOKUP>(byte), expect_graph(c));
+        EXPECT_EQ(fastlex::ascii::islower<BITMAP>(byte), expect_lower(c));
+        EXPECT_EQ(fastlex::ascii::islower<LOOKUP>(byte), expect_lower(c));
+        EXPECT_EQ(fastlex::ascii::isprint<BITMAP>(byte), expect_print(c));
+        EXPECT_EQ(fastlex::ascii::isprint<LOOKUP>(byte), expect_print(c));
+        EXPECT_EQ(fastlex::ascii::ispunct<BITMAP>(byte), expect_punct(c));
+        EXPECT_EQ(fastlex::ascii::ispunct<LOOKUP>(byte), expect_punct(c));
+        EXPECT_EQ(fastlex::ascii::isspace<BITMAP>(byte), expect_space(c));
+        EXPECT_EQ(fastlex::ascii::isspace<LOOKUP>(byte), expect_space(c));
+        EXPECT_EQ(fastlex::ascii::isupper<BITMAP>(byte), expect_upper(c));
+        EXPECT_EQ(fastlex::ascii::isupper<LOOKUP>(byte), expect_upper(c));
+        EXPECT_EQ(fastlex::ascii::isxdigit<BITMAP>(byte), expect_xdigit(c));
+        EXPECT_EQ(fastlex::ascii::isxdigit<LOOKUP>(byte), expect_xdigit(c));
+    }
+}
+
 TEST(FastlexAscii, ConvertsCaseForEveryByte)
 {
     for(int c = 0; c <= 255; ++c) {
