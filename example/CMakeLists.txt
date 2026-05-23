@@ -1,2 +1,5 @@
 add_executable(fastlex_example classify.cpp)
 target_link_libraries(fastlex_example PRIVATE fastlex::fastlex)
+
+add_executable(fastlex_custom_matcher_example custom_matcher.cpp)
+target_link_libraries(fastlex_custom_matcher_example PRIVATE fastlex::fastlex)

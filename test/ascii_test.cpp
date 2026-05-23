@@ -1,5 +1,6 @@
 #include <fastlex/ascii.hpp>
 
+#include <cstdint>
 #include <string_view>
 
 #include <gtest/gtest.h>
@@ -194,4 +195,24 @@ TEST(FastlexAscii, SupportsBothCustomMatcherBackends)
         EXPECT_EQ(bitmap(byte), expected);
         EXPECT_EQ(lookup(byte), expected);
     }
+}
+
+TEST(FastlexAscii, CoversRuntimeConstructionOfMatcherStorage)
+{
+    using enum fastlex::ascii::matcher_backend;
+
+    // Public custom matchers are consteval, so runtime coverage cannot see their construction.
+    fastlex::ascii::detail::char_bitmap bitmap_table{};
+    bitmap_table['x' >> 6] |= std::uint64_t{1} << ('x' & 63u);
+
+    fastlex::ascii::detail::char_map lookup_table{};
+    lookup_table['x'] = 1u;
+
+    fastlex::ascii::detail::custom_matcher<BITMAP> bitmap{bitmap_table};
+    fastlex::ascii::detail::custom_matcher<LOOKUP> lookup{lookup_table};
+
+    EXPECT_TRUE(bitmap('x'));
+    EXPECT_TRUE(lookup('x'));
+    EXPECT_FALSE(bitmap('y'));
+    EXPECT_FALSE(lookup('y'));
 }
