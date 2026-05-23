@@ -1,8 +1,12 @@
 #include <fastlex/ascii.hpp>
 
+#include <string_view>
+
 #include <gtest/gtest.h>
 
 namespace {
+
+using namespace std::literals;
 
 // clang-format off
 constexpr auto between(int c, int lo, int hi) -> bool { return c >= lo && c <= hi; }
@@ -44,12 +48,20 @@ constexpr auto all_bytes(Predicate predicate) -> bool
 }
 
 // clang-format off
-static_assert(fastlex::ascii::bitmap_contains(fastlex::ascii::digit_chars, '7'));
-static_assert(!fastlex::ascii::bitmap_contains(fastlex::ascii::digit_chars, 'x'));
-static_assert(fastlex::ascii::make_bitmap("az")[0] == 0);
+static_assert(fastlex::ascii::custom("az"sv)('a'));
+static_assert(fastlex::ascii::custom("az"sv)('z'));
+static_assert(!fastlex::ascii::custom("az"sv)('b'));
+static_assert(fastlex::ascii::custom<fastlex::ascii::matcher_backend::BITMAP>("az"sv)('a'));
+static_assert(!fastlex::ascii::custom<fastlex::ascii::matcher_backend::BITMAP>("az"sv)('b'));
+static_assert(fastlex::ascii::custom<fastlex::ascii::matcher_backend::LOOKUP>("az"sv)('a'));
+static_assert(!fastlex::ascii::custom<fastlex::ascii::matcher_backend::LOOKUP>("az"sv)('b'));
 static_assert(fastlex::ascii::isalnum('Q'));
+static_assert(fastlex::ascii::isalnum<fastlex::ascii::matcher_backend::LOOKUP>('Q'));
+static_assert(fastlex::ascii::isalnum<fastlex::ascii::matcher_backend::BITMAP>('Q'));
 static_assert(fastlex::ascii::isalpha('Q'));
 static_assert(fastlex::ascii::isdigit('3'));
+static_assert(fastlex::ascii::isdigit<fastlex::ascii::matcher_backend::BITMAP>('3'));
+static_assert(fastlex::ascii::isdigit<fastlex::ascii::matcher_backend::LOOKUP>('3'));
 static_assert(!fastlex::ascii::isxdigit('_'));
 static_assert(fastlex::ascii::tolower('A') == 'a');
 static_assert(fastlex::ascii::toupper('z') == 'Z');
@@ -117,11 +129,34 @@ TEST(FastlexAscii, KeepsCaseConversionBoundariesTight)
     EXPECT_EQ(fastlex::ascii::toupper('{'), '{');
 }
 
-TEST(FastlexAscii, SupportsCustomCompileTimeBitmaps)
+TEST(FastlexAscii, SupportsCustomCompileTimeMatchers)
 {
-    constexpr auto separators = fastlex::ascii::make_bitmap(",:;|");
+    constexpr auto separators = fastlex::ascii::custom(",:;|"sv);
+    constexpr auto ident_start = fastlex::ascii::custom(
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"sv);
 
-    EXPECT_TRUE(fastlex::ascii::bitmap_contains(separators, ','));
-    EXPECT_TRUE(fastlex::ascii::bitmap_contains(separators, '|'));
-    EXPECT_FALSE(fastlex::ascii::bitmap_contains(separators, 'x'));
+    EXPECT_TRUE(separators(','));
+    EXPECT_TRUE(separators('|'));
+    EXPECT_FALSE(separators('x'));
+
+    EXPECT_TRUE(ident_start('A'));
+    EXPECT_TRUE(ident_start('z'));
+    EXPECT_TRUE(ident_start('_'));
+    EXPECT_FALSE(ident_start('7'));
+}
+
+TEST(FastlexAscii, SupportsBothCustomMatcherBackends)
+{
+    constexpr auto bitmap = fastlex::ascii::custom<fastlex::ascii::matcher_backend::BITMAP>(
+        "0123456789_"sv);
+    constexpr auto lookup = fastlex::ascii::custom<fastlex::ascii::matcher_backend::LOOKUP>(
+        "0123456789_"sv);
+
+    for(int c = 0; c <= 255; ++c) {
+        auto const byte = static_cast<unsigned char>(c);
+        auto const expected = expect_digit(c) || c == '_';
+        SCOPED_TRACE(c);
+        EXPECT_EQ(bitmap(byte), expected);
+        EXPECT_EQ(lookup(byte), expected);
+    }
 }
